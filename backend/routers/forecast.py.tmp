@@ -1,17 +1,17 @@
 import time
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from services.data_source import fetch_history
 from services.forecaster import train_and_forecast
 
 router = APIRouter(prefix="/api", tags=["forecast"])
 
-_CACHE_TTL = 3600
 _cache: dict = {"result": None, "at": 0.0}
+_TTL_SECONDS = 3600
 
 
-def _compute() -> dict:
+def _compute():
     series = fetch_history()
     if len(series) < 60:
         raise HTTPException(status_code=502, detail="Not enough history to model.")
@@ -19,17 +19,21 @@ def _compute() -> dict:
 
 
 @router.get("/forecast")
-def forecast(refresh: bool = False):
+def forecast(refresh: bool = Query(default=False)):
     now = time.time()
-    fresh = _cache["result"] is not None and now - _cache["at"] < _CACHE_TTL
+    fresh = _cache["result"] is not None and (now - _cache["at"]) < _TTL_SECONDS
     if fresh and not refresh:
-        return {**_cache["result"], "cached": True}
+        return _cache["result"]
+
     try:
         result = _compute()
     except HTTPException:
         raise
     except Exception as exc:
+        if _cache["result"] is not None:
+            return _cache["result"]
         raise HTTPException(status_code=502, detail=f"Forecast failed: {exc}") from exc
+
     _cache["result"] = result
     _cache["at"] = now
-    return {**result, "cached": False}
+    return result

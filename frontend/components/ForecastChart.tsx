@@ -72,7 +72,7 @@ export default function ForecastChart({ data }: { data: ForecastResult }) {
           <Tooltip
             formatter={(value: number | number[], name: string) => {
               if (Array.isArray(value)) {
-                return [`${fmtUsd(value[0])} – ${fmtUsd(value[1])}`, "95% interval"];
+                return [`${fmtUsd(value[0])} to ${fmtUsd(value[1])}`, "95% interval"];
               }
               return [fmtUsd(value), name === "history" ? "Actual" : "Forecast"];
             }}

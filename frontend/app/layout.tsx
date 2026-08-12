@@ -7,7 +7,7 @@ const body = Space_Grotesk({ subsets: ["latin"], variable: "--font-body" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Signal — Bitcoin forecast",
+  title: "Signal - Bitcoin forecast",
   description: "A time-series ML pipeline with confidence intervals.",
 };
 

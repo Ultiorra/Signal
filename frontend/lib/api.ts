@@ -18,8 +18,9 @@ export interface ForecastResult {
   };
 }
 
-export async function getForecast(): Promise<ForecastResult> {
-  const res = await fetch(`${API_URL}/api/forecast`);
+export async function getForecast(refresh = false): Promise<ForecastResult> {
+  const url = `${API_URL}/api/forecast${refresh ? "?refresh=true" : ""}`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error((await res.json()).detail || "Forecast failed");
   return res.json();
 }
